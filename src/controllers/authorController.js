@@ -37,14 +37,19 @@ const authors= async function (req, res) {
     if (!/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/.test(data.email)) {
       return res.status(400).send({status: false,message: "invalid emailId"});
     }
+    let  email = await authorModel.findOne({email:data.email})
+    if (email) {  
+      return res.status(400).send({status: false,message: "email already exists"});
+    }
 
     if(!data.password){
         return res.status(400).send({status:false,message:" password is required"})
     }
  
-    // if(!/^(?=.[A-Za-z])(?=.\d)[A-Za-z\d]{8,}$/.test(data.password)) {
-    //   return res.status(400).send({status: false,message: "password dosent match with formate"});
-    // }
+    if(!/^[a-zA-Z0-9'@&#.\s]{8,15}$/.test(data.password)) {
+      return res.status(400).send({status: false,message: "password dosent match with formate"});
+    }
+
        let authorCreated =await authorModel.create(req.body)
        return res.status(201).send({status:true,date:authorCreated, msg:"created"}) 
 

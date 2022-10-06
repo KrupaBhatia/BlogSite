@@ -183,9 +183,9 @@ const deleteQuery = async function (req, res) {
        { new: true })
        console.log(filterData)
         if (!filterData) {
-      return res.status(404).send({ status: false, msg: "Documents not found.." });
+      return res.status(200).send({ status: true, msg: "deleted data by query successfully" ,Data: filterData});
     }
-    res.status(200).send({ status: true,msg:"deleted data by query successfully", Data: filterData });
+    // res.status(200).send({ status: true,msg:"deleted data by query successfully", Data: filterData });
   }
    catch (err) {
     res.status(500).send({ status: false, msg: "Error", error: err.message });
