@@ -1,4 +1,4 @@
-const authorModel = require("../model/authorModel");
+const author = require("../model/authorModel");
 const jwt = require("jsonwebtoken");
 
 // ========================================[create-author]====================================================================
@@ -9,18 +9,16 @@ const authors= async function (req, res) {
 
     if (Object.keys(data).length === 0) return res.status(400).send({ msg: "please provide sufficient data " })
 
-    if(!data.fName ){
-     return res.status(400).send({status:false,message:"author first name is required"})
+    if(!data.name ){
+     return res.status(400).send({status:false,message:"author name is required"})
     }
 
-    if(!/^[a-zA-Z]{2,}$/.test(data.fName)){
-        return res.status(400).send({status:false,message:"first name is not in right format"})
+    
+    if(!data.userName ){
+      return res.status(400).send({status:false,message:"author username is required"})
     }
-    if(!data.lName ){
-      return res.status(400).send({status:false,message:"author last name is required"})
-    }
-    if(!/^[a-zA-Z]{2,}$/.test(data.lName)){
-       return res.status(400).send({status:false,message:" last name is not in right format "})
+    if(!/^[a-zA-Z]{2,}$/.test(data.userName)){
+       return res.status(400).send({status:false,message:"  name is not in right format "})
     }
     if(!data.email){
       return res.status(400).send({status:false,message:" email is required"})
@@ -28,7 +26,7 @@ const authors= async function (req, res) {
     if (!/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/.test(data.email)) {
       return res.status(400).send({status: false,message: "invalid emailId"});
     }
-    let  email = await authorModel.findOne({email:data.email})
+    let  email = await author.findOne({email:data.email})
     if (email) {  
       return res.status(400).send({status: false,message: "email already exists"});
     }
@@ -37,12 +35,12 @@ const authors= async function (req, res) {
         return res.status(400).send({status:false,message:" password is required"})
     }
  
-    if(!/^[a-zA-Z0-9'@&#.\s]{8,15}$/.test(data.password)) {
-      return res.status(400).send({status: false,message: "password dosent match with formate"});
-    }
+    // if(!/^[a-zA-Z0-9'@&#.\s]{8,15}$/.test(data.password)) {
+    //   return res.status(400).send({status: false,message: "password dosent match with format"});
+    // }
 
-       let authorCreated =await authorModel.create(req.body)
-       return res.status(201).send({status:true,date:authorCreated, msg:"created"}) 
+       let authorCreated =await author.create(req.body)
+       return res.status(201).send({status:true,data:authorCreated, msg:"created"}) 
 
     }
     catch (err) {

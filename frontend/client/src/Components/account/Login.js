@@ -1,7 +1,8 @@
 
 import React, { useState } from "react"
-import { Box, Button, TextField, Typography, styled } from '@mui/material'
-
+import { Box, Button, TextField, Typography, styled } from '@mui/material';
+import { API } from "../../Service/api";
+console.log(API);
 const Component = styled(Box)`
         width:400px;
         margin:auto;
@@ -47,8 +48,9 @@ const SignButton = styled(Button)`
 
 
     const initial = {
-        name : '',
+        name : " ",
         userName: " ", 
+        email : " ",
         password : " "  
       }
 
@@ -66,8 +68,8 @@ function Login() {
         setSignup({...signup , [e.target.name] : e.target.value}) 
     }
 
-    function signUpUser(){
-          
+    const signupUser = async () => {
+        let response = await API.userSignup(signup)  
     }
     const imageURL = 'https://www.sesta.it/wp-content/uploads/2021/03/logo-blog-sesta-trasparente.png';
     return (
@@ -87,8 +89,9 @@ function Login() {
                         <Wrapper>
                             <TextField variant="standard" onChange={(e) => onInputChange(e)}  name = "name" label="Enter Name" />
                             <TextField variant="standard"  onChange={(e) => onInputChange(e)}  name = "username" label=" Enter userName" />
+                            <TextField variant="standard"  onChange={(e) => onInputChange(e)}  name = "email" label=" Enter email" />
                             <TextField variant="standard"  onChange={(e) => onInputChange(e)}  name = "password" label="Enter Password" />
-                            <SignButton onClick={() => signUpUser()}>Sign Up</SignButton>
+                            <SignButton onClick={() => signupUser()}>Sign Up</SignButton>
                             <Typography style={{ textAlign: "center" }}> OR</Typography>
                             <LoginButton variant="contained "  onClick={() => toggleSignup()}>Already have an Account</LoginButton>
                         </Wrapper>

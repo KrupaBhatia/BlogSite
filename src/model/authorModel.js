@@ -18,9 +18,8 @@ const authorSchema = new mongoose.Schema( {
     required:true,
     unique:true,
     trim:true
-    
-    },
-    password:{
+  },
+  password:{
         type:String,
         required:true,
         trim:true
@@ -28,4 +27,4 @@ const authorSchema = new mongoose.Schema( {
     
    }, { timestamps: true });
 
-module.exports = mongoose.model('author', authorSchema)
+module.exports = mongoose.model('users', authorSchema)
