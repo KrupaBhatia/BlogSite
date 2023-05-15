@@ -9,15 +9,6 @@ const authors= async function (req, res) {
 
     if (Object.keys(data).length === 0) return res.status(400).send({ msg: "please provide sufficient data " })
 
-    if(!data.title ||typeof data.title!=="string" ){
-        return res.status(400).send({status:false,message:"author title is required"})
-    }
-      if(data.title!=="Mr"){
-      if(data.title!=="Miss"){
-      if(data.title!=="Mrs"){
-      return res.status(400).send({status:false,message:"Should be Mr , Miss , Mrs"})
-       } } }
-
     if(!data.fName ){
      return res.status(400).send({status:false,message:"author first name is required"})
     }
