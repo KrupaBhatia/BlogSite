@@ -24,5 +24,7 @@ export const API_NOTIFICATION_MESSAGE = {
 
 
 export const service_call = {
-    userSignup : {url : "/authors" , method : "POST"}
+    userSignup : {url : "/authors" , method : "POST"},
+
+    userLogin : {url : "/login" , method : "POST"}
 }

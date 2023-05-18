@@ -29,6 +29,13 @@ const Wrapper = styled(Box)`
     }
 `;
 
+const Error = styled(Typography)`
+    font-size : 10px;
+    color : #ff6161;
+    line-height:0;
+    margin-top: 10px;
+    font-weight: 600;
+    `
 
 const LoginButton = styled(Button)`
       text-transform : none ; 
@@ -46,6 +53,11 @@ const SignButton = styled(Button)`
     border-radius : 2px;
     `
 
+    const loginInitial = {
+        email : "",
+        password : ""
+    }
+
 
     const initial = {
         name : " ",
@@ -59,6 +71,8 @@ function Login() {
 
     const [account, setAccount] = useState('login')
     const [signup , setSignup] = useState(initial)
+    const [login , setLogin] = useState(loginInitial)
+    const [error , setError] = useState('')
 
     function toggleSignup () {
         account === "login" ? setAccount('signup') : setAccount('login') 
@@ -68,8 +82,30 @@ function Login() {
         setSignup({...signup , [e.target.name] : e.target.value}) 
     }
 
+    function onValueChange(e){
+        setLogin({...login , [e.target.name] : e.target.value})
+    }
+
     const signupUser = async () => {
-        let response = await API.userSignup(signup)  
+        let response = await API.userSignup(signup);  
+        if(response.isSuccess){
+            setError('');
+            setSignup(initial);
+            setAccount('login')
+        }else{
+            setError("Something went wrong")
+        }
+    }
+
+    const loginUser = async () => {
+        let response = await API.userLogin(login);
+        if(response.isSuccess){
+            setError('');
+            localStorage.setItem('accessToken' , `Bearer ${response.data.token}`)
+            setLogin(loginInitial);
+        }else{
+            setError("Something went wrong")
+        }
     }
     const imageURL = 'https://www.sesta.it/wp-content/uploads/2021/03/logo-blog-sesta-trasparente.png';
     return (
@@ -79,21 +115,25 @@ function Login() {
                 {
                     account === 'login' ?
                         <Wrapper>
-                            <TextField variant="standard" onChange={(e) => onInputChange(e)} name = "name" label="Enter Name" />
-                            <TextField variant="standard" onChange={(e) => onInputChange(e)} name = "password" label="Password" />
-                            <LoginButton variant="contained">Login</LoginButton>
+                            <TextField variant="standard" value={login.email} onChange={(e) => onValueChange(e)} name = "email" label="Enter email" />
+                            <TextField variant="standard" value={login.password} onChange={(e) => onValueChange(e)} name = "password" label="Password" />
+                            
+                            {error && <Error>{error}</Error>}
+                            <LoginButton variant="contained" onDoubleClick={() => loginUser()}>Login</LoginButton>
                             <Typography style={{ textAlign: "center" }}> OR</Typography>
                             <SignButton onClick={() => toggleSignup()}>Create an Account</SignButton>
                         </Wrapper>
                         :
                         <Wrapper>
                             <TextField variant="standard" onChange={(e) => onInputChange(e)}  name = "name" label="Enter Name" />
-                            <TextField variant="standard"  onChange={(e) => onInputChange(e)}  name = "username" label=" Enter userName" />
+                            <TextField variant="standard"  onChange={(e) => onInputChange(e)}  name = "userName" label="Enter userName" />
                             <TextField variant="standard"  onChange={(e) => onInputChange(e)}  name = "email" label=" Enter email" />
                             <TextField variant="standard"  onChange={(e) => onInputChange(e)}  name = "password" label="Enter Password" />
+                            
+                            {error && <Error>{error}</Error>}
                             <SignButton onClick={() => signupUser()}>Sign Up</SignButton>
                             <Typography style={{ textAlign: "center" }}> OR</Typography>
-                            <LoginButton variant="contained "  onClick={() => toggleSignup()}>Already have an Account</LoginButton>
+                            <LoginButton variant="contained"  onClick={() => toggleSignup()}>Already have an Account</LoginButton>
                         </Wrapper>
                 }
 

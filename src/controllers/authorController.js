@@ -1,25 +1,25 @@
 const author = require("../model/authorModel");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt")
 
 // ========================================[create-author]====================================================================
 
 const authors= async function (req, res) {
   try{
      let data=req.body
-
+  
     if (Object.keys(data).length === 0) return res.status(400).send({ msg: "please provide sufficient data " })
 
-    if(!data.name ){
+    if(!data.name){
      return res.status(400).send({status:false,message:"author name is required"})
     }
 
-    
-    if(!data.userName ){
+    if(!data.userName){
       return res.status(400).send({status:false,message:"author username is required"})
     }
-    if(!/^[a-zA-Z]{2,}$/.test(data.userName)){
-       return res.status(400).send({status:false,message:"  name is not in right format "})
-    }
+    // if(!/^[a-zA-Z]{2,}$/.test(data.userName)){
+    //    return res.status(400).send({status:false,message:"name is not in right format "})
+    // }
     if(!data.email){
       return res.status(400).send({status:false,message:" email is required"})
     }
@@ -35,6 +35,9 @@ const authors= async function (req, res) {
         return res.status(400).send({status:false,message:" password is required"})
     }
  
+    const salt = await bcrypt.genSalt(10);
+    const hashedPass = await bcrypt.hash(data.password , salt);
+    req.body.password = hashedPass;
     // if(!/^[a-zA-Z0-9'@&#.\s]{8,15}$/.test(data.password)) {
     //   return res.status(400).send({status: false,message: "password dosent match with format"});
     // }
@@ -60,16 +63,29 @@ const authorLogin = async function (req, res) {
       if(!password){
       return res.status(400).send({status:false,message:"plz provide password "})
       }
-      let authorData = await authorModel.findOne({ email: email, password:password });
+      // let authorData = await author.findOne({ email: email, password:password });
   
-      if (!authorData) return res.status(400).send({ status: false, msg: "Bad request",msg:"user not found" });
+      // if (!authorData) return res.status(400).send({ status: false, msg: "Bad request",msg:"user not found" });
+
+      let authorData = await author.findOne({ email: email });
+      if (!authorData) {
+        return res.status(404).send({ status: false, messege: "no data found " });
+      }
+      console.log(password,authorData.password,"194")
+  
+      let checkPassword = await bcrypt.compare(password, authorData.password); //decrypting hashed pass to compare/verify with original one
+  
+      console.log(checkPassword,"196")
+      if (!checkPassword)
+        return res.status(400).send({ status: false, messege: "Login failed!! password is incorrect." });
+    
   
       let token = jwt.sign(
         {
           author_Id: authorData._id.toString(), //payload
           expiredate: "30d"
         },
-        "PROJECT-FUNCTIONUP"   // SECRET KEY
+        "BlogSite"   // SECRET KEY
       );
       res.setHeader("x-api-key", token);       
       res.status(201).send({ status: true, token: token, msg:"login successfull" });

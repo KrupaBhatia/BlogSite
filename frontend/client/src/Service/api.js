@@ -2,10 +2,7 @@ import axios from 'axios';
 
 import { API_NOTIFICATION_MESSAGE , service_call} from '../Constants/config';
 
-const 
-
-
-API_URL = "http://localhost:8080";
+const  API_URL = "http://localhost:8080";
 
 const axiosInstance = axios.create({
     baseURL : API_URL,
@@ -43,7 +40,7 @@ axiosInstance.interceptors.response.use(
 
 
 const processResponse = (response) => { 
-    if(response.status === 200){
+    if(response.status == 201){
         return {isSuccess : true , data : response.data}
     }else{
         return {
@@ -87,6 +84,8 @@ const processError = (error) => {
 const API = {};
 
 for (const [key , value] of Object.entries(service_call)) {
+    console.log(key);
+    console.log(value);
     API[key] = (body ,showUploadProgress , showDownloadProgress) => 
         axiosInstance({
             method : value.method,
