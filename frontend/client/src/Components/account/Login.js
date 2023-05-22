@@ -1,8 +1,11 @@
 
-import React, { useState } from "react"
+import React, { useState , useContext} from "react"
 import { Box, Button, TextField, Typography, styled } from '@mui/material';
 import { API } from "../../Service/api";
-console.log(API);
+import { DataContext } from "../../Context/DataProvider";
+
+import { useNavigate } from "react-router-dom";
+
 const Component = styled(Box)`
         width:400px;
         margin:auto;
@@ -69,13 +72,17 @@ const SignButton = styled(Button)`
 
 function Login() {
 
-    const [account, setAccount] = useState('login')
+    const [account, toggleAccount] = useState('login')
     const [signup , setSignup] = useState(initial)
     const [login , setLogin] = useState(loginInitial)
     const [error , setError] = useState('')
 
+    const {setAccount} = useContext(DataContext)
+
+    const navigate = useNavigate();
+
     function toggleSignup () {
-        account === "login" ? setAccount('signup') : setAccount('login') 
+        account === "login" ? toggleAccount('signup') : toggleAccount('login') 
     }
 
     function onInputChange(e) {
@@ -91,7 +98,7 @@ function Login() {
         if(response.isSuccess){
             setError('');
             setSignup(initial);
-            setAccount('login')
+            toggleAccount('login')
         }else{
             setError("Something went wrong")
         }
@@ -99,10 +106,17 @@ function Login() {
 
     const loginUser = async () => {
         let response = await API.userLogin(login);
+
+        console.log(response.data);
         if(response.isSuccess){
+            
             setError('');
-            localStorage.setItem('accessToken' , `Bearer ${response.data.token}`)
-            setLogin(loginInitial);
+            sessionStorage.setItem('accessToken' , `Bearer ${response.data.accessToken}`)
+            sessionStorage.setItem('refreshToken' , `Bearer ${response.data.refreshToken}`)
+           
+            setAccount({email : response.data.email , userName: response.data.userName })
+
+            navigate("/");
         }else{
             setError("Something went wrong")
         }

@@ -1,6 +1,10 @@
 const author = require("../model/authorModel");
+const token = require("../model/tokenModel");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const dotenv = require("../../src/.env");
+
+require('dotenv').config()
 
 // ========================================[create-author]====================================================================
 
@@ -63,32 +67,43 @@ const authorLogin = async function (req, res) {
       if(!password){
       return res.status(400).send({status:false,message:"plz provide password "})
       }
-      // let authorData = await author.findOne({ email: email, password:password });
-  
-      // if (!authorData) return res.status(400).send({ status: false, msg: "Bad request",msg:"user not found" });
 
       let authorData = await author.findOne({ email: email });
       if (!authorData) {
         return res.status(404).send({ status: false, messege: "no data found " });
       }
-      console.log(password,authorData.password,"194")
+    
+      
+
   
       let checkPassword = await bcrypt.compare(password, authorData.password); //decrypting hashed pass to compare/verify with original one
-  
-      console.log(checkPassword,"196")
-      if (!checkPassword)
+
+      if(checkPassword){
+        let accessToken = jwt.sign(
+          {
+            author_Id: authorData._id.toString(), //payload
+            expiredate: "15m"
+          },
+          '841d4ea2a3f8bb8629d1acc29079610082ec86a388b97882bf8348c531d4edaaf89773f24a245e99d4b5139840fa21ac2f016b3c24bad67dfd6741528d3f103f'  // SECRET KEY
+        );
+        console.log(accessToken);
+        let refreshToken = jwt.sign(
+          {
+            author_Id: authorData._id.toString(), //payload
+          },
+          'bb0660664df1f0c90a02a72e59d0f388e48adcdbef166027e03339c8e6fc0d693063210b3a22048e0ee021f98ffc41e78b953f0fcdcffb92570ce1650c5f2df8' // SECRET KEY
+        );
+        console.log(refreshToken);
+
+
+        const newToken = new token({token : refreshToken}) ;
+        await newToken.save();
+        res.status(201).send({ status: true, accessToken : accessToken, refreshToken : refreshToken, email : email , msg:"login successfull" });
+      }else{
         return res.status(400).send({ status: false, messege: "Login failed!! password is incorrect." });
+      }
+          
     
-  
-      let token = jwt.sign(
-        {
-          author_Id: authorData._id.toString(), //payload
-          expiredate: "30d"
-        },
-        "BlogSite"   // SECRET KEY
-      );
-      res.setHeader("x-api-key", token);       
-      res.status(201).send({ status: true, token: token, msg:"login successfull" });
      } catch (error) {
       res.status(500).send({ status: false, msg: error.message });
      }
