@@ -70,7 +70,7 @@ const SignButton = styled(Button)`
       }
 
 
-function Login() {
+function Login({ isUserAuthenticated }) {
 
     const [account, toggleAccount] = useState('login')
     const [signup , setSignup] = useState(initial)
@@ -114,7 +114,9 @@ function Login() {
             sessionStorage.setItem('accessToken' , `Bearer ${response.data.accessToken}`)
             sessionStorage.setItem('refreshToken' , `Bearer ${response.data.refreshToken}`)
            
-            setAccount({email : response.data.email , userName: response.data.userName })
+            setAccount({email : response.data.email , userName: response.data.userName });
+            
+            isUserAuthenticated(true)
 
             navigate("/");
         }else{
